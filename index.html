@@ -214,7 +214,7 @@
         d3.csv('timesData.csv', function(data) {
             parcoords
                 .data(data)
-                .hideAxis(["University Name"])
+                .hideAxis(["University Name", "No of Students", "Student Staff Ratio", "International Students"])
                 .render()
                 .brushMode("1D-axes"); // enable brushing
 
