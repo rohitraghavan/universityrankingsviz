@@ -1,0 +1,233 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+
+    <title>World University Rankings Visualization</title>
+
+    <link rel="stylesheet" type="text/css" href="css/pure-min.css">
+    <link rel="stylesheet" type="text/css" href="css/d3.parcoords.css">
+    <link rel="stylesheet" type="text/css" href="css/radar-chart.css">
+    <link rel="stylesheet" type="text/css" href="css/divgrid.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        p {
+            font-size: 13px;
+        }
+
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+    </style>
+
+    <script src="js/d3.v3.min.js"></script>
+    <script src="js/d3.parcoords.js"></script>
+    <script src="js/radar-chart.js"></script>
+    <script src="js/divgrid.js"></script>
+
+</head>
+
+<body>
+    <div id="container" style="padding:20px;">
+        <div id="text">
+            <h1 style="text-align:center">2016 Times Higher Education World University Rankings</h1>
+            <h4 style="text-align:center">Visualization By Nisha and Rohit</h4>
+            <p>Mouse over a row in the data grid to highlight the entry in the Parallel Coordinates chart and display data in the Radar chart.</p>
+            <p>To compare multiple universities in the Radar chart, click on rows in the data grid. To reset, click on the Reset button</p>
+            <p>Brushing data on the Parallel Coordinates chart will update the data grid.</p>
+        </div>
+        <div id="charts" style="overflow:auto;">
+            <div id="parcoords" class="parcoords" style="height:500px; width:70%; float:left;"></div>
+            <div id="radar" class="radar" style="width:30%; float:left;"></div>
+            <button id="reset" style="margin-left:160px; margin-top:30px;" onclick="resetradarchart()">Reset</button>
+        </div>
+        <br>
+        <div id="data-grid">
+            <h4 style="text-align:center">University Rankings Data Grid</h4>
+            <div id="grid"></div>
+        </div>
+    </div>
+
+    <script>
+        // Source contributions
+        //Parallel Coordinates Chart: https://syntagmatic.github.io/parallel-coordinates/examples/table.html
+        //Grid: http://bl.ocks.org/3687826
+        //Radar Chart: http://bl.ocks.org/tpreusse/2bc99d74a461b8c0acb1
+
+        // Quantitative color scale for Parallel Coordinates Chart
+        var color_gradient = d3.scale.linear()
+            .domain([1, 200])
+            .range(["darkblue", "lightblue"])
+            .interpolate(d3.interpolateLab);
+
+        var color = function(d) {
+            return color_gradient(d['World Rank']);
+        };
+
+        // Parallel Coordinates Chart
+        var parcoords = d3.parcoords()("#parcoords")
+            .color(color);
+
+        // Radar Chart
+        // Default config
+        RadarChart.defaultConfig.w = 400;
+        RadarChart.defaultConfig.h = 400;
+        //Default data
+        var data = [{
+            axes: [{
+                    axis: "Teaching Score",
+                    value: 0
+                },
+                {
+                    axis: "International Score",
+                    value: 0
+                },
+                {
+                    axis: "Research Score",
+                    value: 0
+                },
+                {
+                    axis: "Citations Score",
+                    value: 0
+                },
+                {
+                    axis: "Income Score",
+                    value: 0
+                },
+                {
+                    axis: "Total Score",
+                    value: 0
+                }
+            ]
+        }, ];
+        RadarChart.draw("#radar", data);
+
+
+        //Reset radar chart function
+        function resetradarchart() {
+            console.log("Hi")
+            while (data.length != 1) {
+                data.pop();
+            }
+            RadarChart.draw("#radar", data);
+        }
+
+        //Mouse event handlers for data table
+        function handlegridmouseclick(d) {
+            data.push({
+                className: d["World Rank"] + ". " + d["University Name"],
+                axes: [{
+                        axis: "Teaching Score",
+                        value: d["Teaching Score"]
+                    },
+                    {
+                        axis: "International Score",
+                        value: d["International Score"]
+                    },
+                    {
+                        axis: "Research Score",
+                        value: d["Research Score"]
+                    },
+                    {
+                        axis: "Citations Score",
+                        value: d["Citations Score"]
+                    },
+                    {
+                        axis: "Income Score",
+                        value: d["Income Score"]
+                    },
+                    {
+                        axis: "Total Score",
+                        value: d["Total Score"]
+                    }
+                ]
+            });
+            RadarChart.draw("#radar", data);
+        }
+
+        function handlegridmouseover(d) {
+            parcoords.highlight([d]);
+            data.push({
+                className: d["World Rank"] + ". " + d["University Name"],
+                axes: [{
+                        axis: "Teaching Score",
+                        value: d["Teaching Score"]
+                    },
+                    {
+                        axis: "International Score",
+                        value: d["International Score"]
+                    },
+                    {
+                        axis: "Research Score",
+                        value: d["Research Score"]
+                    },
+                    {
+                        axis: "Citations Score",
+                        value: d["Citations Score"]
+                    },
+                    {
+                        axis: "Income Score",
+                        value: d["Income Score"]
+                    },
+                    {
+                        axis: "Total Score",
+                        value: d["Total Score"]
+                    }
+                ]
+            });
+            RadarChart.draw("#radar", data);
+        }
+
+        function handlegridmouseout(d) {
+            parcoords.unhighlight([d]);
+            data.pop();
+            RadarChart.draw("#radar", data);
+        }
+
+        // Load csv file and create the chart
+        d3.csv('timesData.csv', function(data) {
+            parcoords
+                .data(data)
+                .hideAxis(["University Name"])
+                .render()
+                .brushMode("1D-axes"); // enable brushing
+
+            // Create data table, row hover highlighting for parcoors chart and
+            // data display for radar chart
+            var grid = d3.divgrid();
+            d3.select("#grid")
+                .datum(data)
+                .call(grid)
+                .selectAll(".row")
+                .on({
+                    "click": handlegridmouseclick,
+                    "mouseover": handlegridmouseover,
+                    "mouseout": handlegridmouseout
+                });
+
+            // Update data table on brush event
+            parcoords.on("brush", function(d) {
+                d3.select("#grid")
+                    .datum(d)
+                    .call(grid)
+                    .selectAll(".row")
+                    .on({
+                        "click": handlegridmouseclick,
+                        "mouseover": handlegridmouseover,
+                        "mouseout": handlegridmouseout
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>
