@@ -3,32 +3,37 @@
 
 <head>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-    <meta content="utf-8" http-equiv="encoding">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>World University Rankings Visualization</title>
 
-    <link rel="stylesheet" type="text/css" href="css/pure-min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
     <link rel="stylesheet" type="text/css" href="css/d3.parcoords.css">
     <link rel="stylesheet" type="text/css" href="css/radar-chart.css">
     <link rel="stylesheet" type="text/css" href="css/divgrid.css">
 
     <style>
-        * {
-            box-sizing: border-box;
+        .container {
+            width: 95%;
         }
 
-        p {
-            font-size: 13px;
+        .jumbotron {
+            padding: 15px;
         }
 
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
+        .jumbotron>p {
+            font-size: 14px;
         }
 
+        .btn {
+            margin-top: 20px;
+        }
     </style>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="js/d3.v3.min.js"></script>
     <script src="js/d3.parcoords.js"></script>
     <script src="js/radar-chart.js"></script>
@@ -37,25 +42,37 @@
 </head>
 
 <body>
-    <div id="container" style="padding:20px;">
-        <div id="text">
-            <h1 style="text-align:center">2016 Times Higher Education World University Rankings</h1>
-            <h4 style="text-align:center">Visualization By Nisha and Rohit</h4>
+
+    <div class="container theme-showcase" role="main">
+
+        <!-- Main jumbotron for a primary marketing message or call to action -->
+        <div class="jumbotron text-center">
+            <h2 class="text-center">2016 Times Higher Education World University Rankings</h2>
             <p>Mouse over a row in the data grid to highlight the entry in the Parallel Coordinates chart and display data in the Radar chart.</p>
             <p>To compare multiple universities in the Radar chart, click on rows in the data grid. To reset, click on the Reset button</p>
             <p>Brushing data on the Parallel Coordinates chart will update the data grid.</p>
         </div>
-        <div id="charts" style="overflow:auto;">
-            <div id="parcoords" class="parcoords" style="height:400px; width:70%; float:left;"></div>
-            <div id="radar" class="radar" style="width:30%; float:left;"></div>
-            <button id="reset" style="margin-left:125px; margin-top:30px;" onclick="resetradarchart()">Reset</button>
+
+
+        <div class="row">
+            <div class="col-md-9">
+                <div id="parcoords" class="parcoords" style="height:400px;"></div>
+            </div>
+            <div class="col-md-3">
+                <div id="radar" class="radar"></div>
+                <button class="btn btn-primary center-block" id="reset" onclick="resetradarchart()">Reset</button>
+            </div>
         </div>
-        <br>
-        <div id="data-grid">
-            <h4 style="text-align:center">University Rankings Data Grid</h4>
-            <div id="grid"></div>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="data-grid">
+                    <h4 class="text-center">University Rankings Data Grid</h4>
+                    <div id="grid"></div>
+                </div>
+            </div>
         </div>
     </div>
+
 
     <script>
         // Source contributions
@@ -79,7 +96,7 @@
 
         // Radar Chart
         // Default config
-        RadarChart.defaultConfig.w = 300;
+        RadarChart.defaultConfig.w = 400;
         RadarChart.defaultConfig.h = 300;
         //Default data
         var data = [{
